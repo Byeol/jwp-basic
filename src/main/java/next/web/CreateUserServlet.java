@@ -8,12 +8,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import next.model.User;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.db.DataBase;
+import next.model.User;
 
 @WebServlet("/user/create")
 public class CreateUserServlet extends HttpServlet {
@@ -28,7 +27,7 @@ public class CreateUserServlet extends HttpServlet {
                 req.getParameter("name"),
                 req.getParameter("email"));
         log.debug("user : {}", user);
-        DataBase.addUser(user);
-        resp.sendRedirect("/user/list");
+		DataBase.addUser(user);
+		resp.sendRedirect("/user/list");
     }
 }
