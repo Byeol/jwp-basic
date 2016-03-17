@@ -1,44 +1,73 @@
 package core.mvc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import next.controller.CreateUserController;
-import next.controller.HomeController;
-import next.controller.ListUserController;
-import next.controller.LoginController;
-import next.controller.LogoutController;
-import next.controller.ProfileController;
-import next.controller.UpdateFormUserController;
-import next.controller.UpdateUserController;
-
 public class RequestMapping {
-	private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-	private Map<String, Controller> mappings = new HashMap<>();
-	
-	void initMapping() {
-		mappings.put("/", new HomeController());
-	    mappings.put("/users/form", new ForwardController("/user/form.jsp"));
-	    mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
-	    mappings.put("/users", new ListUserController());
-		mappings.put("/users/login", new LoginController());
-		mappings.put("/users/profile", new ProfileController());
-	    mappings.put("/users/logout", new LogoutController());
-	    mappings.put("/users/create", new CreateUserController());
-	    mappings.put("/users/updateForm", new UpdateFormUserController());
-	    mappings.put("/users/update", new UpdateUserController());
+    private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
+    private Map<String, Controller> mappings = new HashMap<>();
+    private Map<String, Controller> regexMappings = new HashMap<>();
 
-		logger.info("Initialized Request Mapping!");
-	}
-	
-	public Controller findController(String url) {
-		return mappings.get(url);
-	}
-	
-	void put(String url, Controller controller) {
-		mappings.put(url, controller);
-	}
+    void initMapping() {
+        mappings.put("/", new HomeController());
+        mappings.put("/users/form", new ForwardController("/user/form.jsp"));
+        mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
+        mappings.put("/users", new ListUserController());
+        mappings.put("/users/login", new LoginController());
+        mappings.put("/users/profile", new ProfileController());
+        mappings.put("/users/logout", new LogoutController());
+        mappings.put("/users/create", new CreateUserController());
+        mappings.put("/users/updateForm", new UpdateFormUserController());
+        mappings.put("/users/update", new UpdateUserController());
+        mappings.put("/questions/form", new FormQuestionController());
+        mappings.put("/questions/create", new CreateQuestionController());
+
+        regexMappings.put("/questions/([^;/?:@&=+$,]+)", new QuestionController());
+
+        logger.info("Initialized Request Mapping!");
+    }
+
+    public Controller findController(String url) {
+        Controller controller = mappings.get(url);
+
+        if (controller == null) {
+            for (String regex : regexMappings.keySet()) {
+                if (url.matches(regex)) {
+                    controller = regexMappings.get(regex);
+                    break;
+                }
+            }
+        }
+
+        return controller;
+    }
+
+    public List<String> getPathVariables(String url) {
+        List<String> groupList = new ArrayList<String>();
+
+        for (String regex : regexMappings.keySet()) {
+            Matcher matcher = Pattern.compile(regex).matcher(url);
+            if (matcher.matches()) {
+                for (int i = 1; i <= matcher.groupCount(); i++) {
+                    groupList.add(matcher.group(i));
+                }
+                break;
+            }
+        }
+
+        return groupList;
+    }
+
+    void put(String url, Controller controller) {
+        mappings.put(url, controller);
+    }
 }

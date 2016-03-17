@@ -1,6 +1,7 @@
 package core.mvc;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -32,7 +33,9 @@ public class DispatcherServlet extends HttpServlet {
 		logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
 		Controller controller = rm.findController(requestUri);
+		List<String> pathVariables = rm.getPathVariables(requestUri);
 		try {
+			req.setAttribute("pathVariables", pathVariables);
 			String viewName = controller.execute(req, resp);
 			move(viewName, req, resp);
 		} catch (Throwable e) {
