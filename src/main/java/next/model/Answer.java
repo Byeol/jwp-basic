@@ -4,20 +4,20 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 public class Answer {
-    private Integer answerId;
+    private Long answerId;
     private String writer;
     private String contents;
     private Timestamp createdDate;
-    private Integer questionId;
+    private Long questionId;
 
-    public Answer(String writer, String contents, Integer questionId) {
+    public Answer(String writer, String contents, Long questionId) {
         this.writer = writer;
         this.contents = contents;
         this.createdDate = new Timestamp(new Date().getTime());
         this.questionId = questionId;
     }
 
-    public Answer(Integer answerId, String writer, String contents, Timestamp createdDate, Integer questionId) {
+    public Answer(Long answerId, String writer, String contents, Timestamp createdDate, Long questionId) {
         this.answerId = answerId;
         this.writer = writer;
         this.contents = contents;
@@ -25,7 +25,7 @@ public class Answer {
         this.questionId = questionId;
     }
 
-    public Integer getAnswerId() {
+    public Long getAnswerId() {
         return answerId;
     }
 
@@ -41,7 +41,7 @@ public class Answer {
         return createdDate;
     }
 
-    public Integer getQuestionId() {
+    public Long getQuestionId() {
         return questionId;
     }
 

@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 public class Question {
-    private Integer questionId;
+    private Long questionId;
     private String writer;
     private String title;
     private String contents;
@@ -19,7 +19,7 @@ public class Question {
         this.countOfAnswer = 0;
     }
 
-    public Question(Integer questionId, String writer, String title, String contents, Timestamp createdDate, Integer countOfAnswer) {
+    public Question(Long questionId, String writer, String title, String contents, Timestamp createdDate, Integer countOfAnswer) {
         this.questionId = questionId;
         this.writer = writer;
         this.title = title;
@@ -28,7 +28,7 @@ public class Question {
         this.countOfAnswer = countOfAnswer;
     }
 
-    public Integer getQuestionId() {
+    public Long getQuestionId() {
         return questionId;
     }
 
@@ -63,5 +63,4 @@ public class Question {
                 ", countOfAnswer=" + countOfAnswer +
                 "]";
     }
-
 }
