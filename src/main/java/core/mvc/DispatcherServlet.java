@@ -1,6 +1,7 @@
 package core.mvc;
 
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -8,9 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
 
 @WebServlet(name = "dispatcher", urlPatterns = {"", "/"}, loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -34,7 +33,9 @@ public class DispatcherServlet extends HttpServlet {
 		Controller controller = rm.findController(requestUri);
 		try {
 			String viewName = controller.execute(req, resp);
-			move(viewName, req, resp);
+			if (viewName != null) {
+				move(viewName, req, resp);
+			}
 		} catch (Throwable e) {
 			logger.error("Exception : {}", e);
 			throw new ServletException(e.getMessage());

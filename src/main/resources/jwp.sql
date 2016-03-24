@@ -5,7 +5,7 @@ CREATE TABLE USERS (
 	password		varchar(12)		NOT NULL,
 	name			varchar(20)		NOT NULL,
 	email			varchar(50),	
-  	
+
 	PRIMARY KEY               (userId)
 );
 
@@ -33,6 +33,10 @@ CREATE TABLE ANSWERS (
 	questionId			bigint				NOT NULL,				
 	PRIMARY KEY         (answerId)
 );
+
+ALTER TABLE ANSWERS
+	ADD FOREIGN KEY (questionId)
+	REFERENCES QUESTIONS (questionId);
 
 INSERT INTO QUESTIONS (questionId, writer, title, contents, createdDate, countOfAnswer) VALUES
 (1, '자바지기',

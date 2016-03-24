@@ -1,17 +1,13 @@
 package next.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.List;
-
-import next.model.Answer;
 import core.jdbc.JdbcTemplate;
 import core.jdbc.KeyHolder;
 import core.jdbc.PreparedStatementCreator;
 import core.jdbc.RowMapper;
+import next.model.Answer;
+
+import java.sql.*;
+import java.util.List;
 
 public class AnswerDao {
     public Answer insert(Answer answer) {
@@ -31,7 +27,42 @@ public class AnswerDao {
         
 		KeyHolder keyHolder = new KeyHolder();
         jdbcTemplate.update(psc, keyHolder);
+
+        QuestionDao questionDao = new QuestionDao();
+        questionDao.increaseCountOfAnswer(answer.getQuestionId());
+
         return findById(keyHolder.getId());
+    }
+
+    public Answer update(Answer answer) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
+        String sql = "UPDATE ANSWERS SET writer = ?, contents = ? WHERE answerId = ?";
+        PreparedStatementCreator psc = new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement pstmt = con.prepareStatement(sql);
+                pstmt.setString(1, answer.getWriter());
+                pstmt.setString(2, answer.getContents());
+                pstmt.setLong(3, answer.getAnswerId());
+                return pstmt;
+            }
+        };
+
+        KeyHolder keyHolder = new KeyHolder();
+        jdbcTemplate.update(psc, keyHolder);
+
+        return findById(answer.getAnswerId());
+    }
+
+    public void delete(long answerId) {
+        Answer answer = findById(answerId);
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
+        String sql = "DELETE FROM ANSWERS WHERE answerId = ?";
+        jdbcTemplate.update(sql, answerId);
+
+        QuestionDao questionDao = new QuestionDao();
+        questionDao.decreaseCountOfAnswer(answer.getQuestionId());
     }
 
     public Answer findById(long answerId) {

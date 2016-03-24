@@ -24,7 +24,7 @@ public class Answer {
 		this.createdDate = createdDate;
 		this.questionId = questionId;
 	}
-	
+
 	public long getAnswerId() {
 		return answerId;
 	}
@@ -48,7 +48,15 @@ public class Answer {
 	public long getQuestionId() {
 		return questionId;
 	}
-	
+
+	public void setWriter(String writer) {
+		this.writer = writer;
+	}
+
+	public void setContents(String contents) {
+		this.contents = contents;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

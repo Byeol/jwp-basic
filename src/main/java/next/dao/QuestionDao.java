@@ -1,12 +1,12 @@
 package next.dao;
 
+import core.jdbc.JdbcTemplate;
+import core.jdbc.RowMapper;
+import next.model.Question;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-
-import next.model.Question;
-import core.jdbc.JdbcTemplate;
-import core.jdbc.RowMapper;
 
 public class QuestionDao {
 	public List<Question> findAll() {
@@ -45,5 +45,17 @@ public class QuestionDao {
 		};
 		
 		return jdbcTemplate.queryForObject(sql, rm, questionId);
+	}
+
+	public void increaseCountOfAnswer(long questionId) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate();
+		String sql = "UPDATE QUESTIONS SET countOfAnswer = countOfAnswer + 1 WHERE questionId = ?";
+		jdbcTemplate.update(sql, questionId);
+	}
+
+	public void decreaseCountOfAnswer(long questionId) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate();
+		String sql = "UPDATE QUESTIONS SET countOfAnswer = countOfAnswer - 1 WHERE questionId = ?";
+		jdbcTemplate.update(sql, questionId);
 	}
 }
