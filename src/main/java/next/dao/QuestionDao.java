@@ -1,12 +1,13 @@
 package next.dao;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import next.model.Question;
 import core.jdbc.JdbcTemplate;
+import core.jdbc.KeyHolder;
+import core.jdbc.PreparedStatementCreator;
 import core.jdbc.RowMapper;
+import next.model.Question;
+
+import java.sql.*;
+import java.util.List;
 
 public class QuestionDao {
 	public List<Question> findAll() {
@@ -45,5 +46,33 @@ public class QuestionDao {
 		};
 		
 		return jdbcTemplate.queryForObject(sql, rm, questionId);
+	}
+
+	public Question insert(Question question) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate();
+		String sql = "INSERT INTO QUESTIONS (questionId, writer, title, contents, createdDate, countOfAnswer) VALUES (?, ?, ?, ?, ?, ?)";
+		PreparedStatementCreator psc = new PreparedStatementCreator() {
+			@Override
+			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+				PreparedStatement pstmt = con.prepareStatement(sql);
+				pstmt.setLong(1, question.getQuestionId());
+				pstmt.setString(2, question.getWriter());
+				pstmt.setString(3, question.getTitle());
+				pstmt.setString(4, question.getContents());
+				pstmt.setTimestamp(5, new Timestamp(question.getTimeFromCreateDate()));
+				pstmt.setLong(6, question.getCountOfComment());
+				return pstmt;
+			}
+		};
+
+		KeyHolder keyHolder = new KeyHolder();
+		jdbcTemplate.update(psc, keyHolder);
+		return findById(keyHolder.getId());
+	}
+
+	public void delete(long questionId) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate();
+		String sql = "DELETE FROM QUESTIONS WHERE questionId = ?";
+		jdbcTemplate.update(sql, questionId);
 	}
 }
