@@ -24,12 +24,19 @@ import static org.mockito.Mockito.*;
 public class QuestionTest {
 
     @Mock
+    private Answer answerByOwner;
+
+    @Mock
+    private Answer answerByOthers;
+
+    @Mock
     private QuestionDao questionDao;
 
     @Mock
     private AnswerDao answerDao;
 
     private long questionId;
+    private String questionWriter;
 
     @Before
     public void initMocks() {
@@ -37,9 +44,10 @@ public class QuestionTest {
 
         List<Answer> answers = new ArrayList<>();
         questionId = new Random().nextLong();
+        questionWriter = "writer";
 
         when(questionDao.findById(questionId))
-            .thenReturn(new Question(questionId, "writer", "title", "contents", new Date(), 0));
+            .thenReturn(new Question(questionId, questionWriter, "title", "contents", new Date(), 0));
 
         when(answerDao.insert(any(Answer.class)))
             .then(invocation -> {
@@ -52,6 +60,11 @@ public class QuestionTest {
                     .filter(answer -> answer.getQuestionId() == invocation.getArgumentAt(0, Long.class))
                     .collect(Collectors.toList())
             );
+
+        when(answerByOwner.canDelete(questionWriter)).thenReturn(true);
+        when(answerByOwner.getQuestionId()).thenReturn(questionId);
+        when(answerByOthers.canDelete(questionWriter)).thenReturn(false);
+        when(answerByOthers.getQuestionId()).thenReturn(questionId);
     }
 
     @Test
@@ -66,31 +79,30 @@ public class QuestionTest {
     public void deleteQuestionHasOwnAnswer() throws Exception {
         Question question = questionDao.findById(questionId);
         question.injectDao(questionDao, answerDao);
-        Answer answer = new Answer(question.getWriter(), "contents", question.getQuestionId());
-        answerDao.insert(answer);
+        answerDao.insert(answerByOwner);
         question.delete();
         verify(questionDao).delete(question.getQuestionId());
+        verify(answerByOwner).delete(questionWriter);
     }
 
     @Test(expected = NotAllowedException.class)
     public void deleteQuestionHasOthersAnswer() throws Exception {
         Question question = questionDao.findById(questionId);
         question.injectDao(questionDao, answerDao);
-        Answer answer = new Answer("writer 2", "contents", question.getQuestionId());
-        answerDao.insert(answer);
+        answerDao.insert(answerByOthers);
         question.delete();
         verify(questionDao, never()).delete(question.getQuestionId());
+        verify(answerByOthers, never()).delete(questionWriter);
     }
 
     @Test
     public void deleteQuestionHasMultipleOwnAnswer() throws Exception {
         Question question = questionDao.findById(questionId);
         question.injectDao(questionDao, answerDao);
-        Answer answer = new Answer(question.getWriter(), "contents", question.getQuestionId());
-        answerDao.insert(answer);
-        answer = new Answer(question.getWriter(), "contents", question.getQuestionId());
-        answerDao.insert(answer);
+        answerDao.insert(answerByOwner);
+        answerDao.insert(answerByOwner);
         question.delete();
         verify(questionDao).delete(question.getQuestionId());
+        verify(answerByOwner, times(2)).delete(questionWriter);
     }
 }

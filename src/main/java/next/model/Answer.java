@@ -1,8 +1,17 @@
 package next.model;
 
+import next.dao.AnswerDao;
+import next.exception.NotAllowedException;
+
 import java.util.Date;
 
 public class Answer {
+	private AnswerDao answerDao;
+
+	public void injectDao(AnswerDao answerDao) {
+		this.answerDao = answerDao;
+	}
+
 	private long answerId;
 	
 	private String writer;
@@ -23,6 +32,7 @@ public class Answer {
 		this.contents = contents;
 		this.createdDate = createdDate;
 		this.questionId = questionId;
+		this.answerDao = new AnswerDao();
 	}
 	
 	public long getAnswerId() {
@@ -80,5 +90,13 @@ public class Answer {
 
 	public boolean canDelete(String writer) {
 		return getWriter().equals(writer);
+	}
+
+	public void delete(String writer) throws Exception {
+		if (!canDelete(writer)) {
+			throw new NotAllowedException();
+		}
+
+		answerDao.delete(getAnswerId());
 	}
 }

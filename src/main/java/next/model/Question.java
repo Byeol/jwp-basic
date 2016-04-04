@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.List;
 
 public class Question {
-
 	private QuestionDao questionDao;
 	private AnswerDao answerDao;
 
@@ -118,11 +117,18 @@ public class Question {
 	}
 
 	public void delete() throws Exception {
-		List<Answer> answers = getAnswers();
-
 		if (!canDelete(getWriter())) {
 			throw new NotAllowedException();
 		}
+
+		List<Answer> answers = getAnswers();
+		answers.forEach(answer -> {
+			try {
+				answer.delete(getWriter());
+			} catch (Exception e) {
+				throw new RuntimeException();
+			}
+		});
 
 		questionDao.delete(getQuestionId());
 	}
