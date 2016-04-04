@@ -5,13 +5,12 @@ import core.mvc.ModelAndView;
 import next.exception.NotAllowedException;
 import next.model.Result;
 import next.service.QuestionService;
-import next.service.QuestionServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class DeleteQuestionRestController extends AbstractController {
-    private QuestionService questionService = new QuestionServiceImpl();
+    private QuestionService questionService = new QuestionService();
 
     @Override
     public ModelAndView execute(HttpServletRequest request, HttpServletResponse response) throws Exception {

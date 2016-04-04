@@ -1,8 +1,22 @@
 package next.model;
 
+import next.dao.AnswerDao;
+import next.dao.QuestionDao;
+import next.exception.NotAllowedException;
+
 import java.util.Date;
+import java.util.List;
 
 public class Question {
+
+	private QuestionDao questionDao;
+	private AnswerDao answerDao;
+
+	public void injectDao(QuestionDao questionDao, AnswerDao answerDao) {
+		this.questionDao = questionDao;
+		this.answerDao = answerDao;
+	}
+
 	private long questionId;
 	
 	private String writer;
@@ -27,6 +41,8 @@ public class Question {
 		this.contents = contents;
 		this.createdDate = createdDate;
 		this.countOfComment = countOfComment;
+		this.questionDao = new QuestionDao();
+		this.answerDao = new AnswerDao();
 	}
 
 	public long getQuestionId() {
@@ -85,5 +101,33 @@ public class Question {
 		if (questionId != other.questionId)
 			return false;
 		return true;
+	}
+
+	public boolean canDelete(String writer) {
+		if (!getWriter().equals(writer))
+			return false;
+
+		List<Answer> answers = getAnswers();
+
+		for (Answer answer : answers) {
+			if (!answer.canDelete(getWriter()))
+				return false;
+		}
+
+		return true;
+	}
+
+	public void delete() throws Exception {
+		List<Answer> answers = getAnswers();
+
+		if (!canDelete(getWriter())) {
+			throw new NotAllowedException();
+		}
+
+		questionDao.delete(getQuestionId());
+	}
+
+	public List<Answer> getAnswers() {
+		return answerDao.findAllByQuestionId(getQuestionId());
 	}
 }

@@ -77,4 +77,8 @@ public class Answer {
 				+ ", contents=" + contents + ", createdDate=" + createdDate
 				+ ", questionId=" + questionId + "]";
 	}
+
+	public boolean canDelete(String writer) {
+		return getWriter().equals(writer);
+	}
 }
